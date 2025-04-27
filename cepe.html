@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Advanced PHP Calculator</title>
+<link rel="stylesheet" href="cepe.php">
+<style>
+body {
+background: linear-gradient(to right, #00c6ff, #0072ff);
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+display: flex;
+justify-content: center;
+align-items: center;
+height: 100vh;
+margin: 0;
+}
+
+.calculator {
+background-color: #ffffff;
+padding: 30px 40px;
+border-radius: 15px;
+box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+text-align: center;
+width: 380px;
+}
+
+h2 {
+color: #333;
+margin-bottom: 20px;
+}
+
+input[type="number"],
+select {
+width: 100%;
+padding: 10px;
+margin: 10px 0 20px;
+border: 1px solid #ccc;
+border-radius: 8px;
+font-size: 16px;
+}
+
+input[type="submit"],
+.clear {
+background-color: #28a745;
+color: white;
+padding: 10px;
+border: none;
+border-radius: 8px;
+font-size: 16px;
+cursor: pointer;
+width: 100%;
+transition: background-color 0.3s ease;
+margin-top: 10px;
+}
+
+input[type="submit"]:hover,
+.clear:hover {
+background-color: #218838;
+}
+
+.result {
+margin-top: 20px;
+padding: 15px;
+background-color: #e9f7ef;
+border-left: 4px solid #28a745;
+font-size: 18px;
+color: #333;
+border-radius: 8px;
+}
+
+.history {
+margin-top: 25px;
+text-align: left;
+}
+
+.history h3 {
+font-size: 16px;
+color: #555;
+margin-bottom: 10px;
+}
+
+.history ul {
+list-style-type: square;
+padding-left: 20px;
+color: #333;
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('form[method="get"]');
+    const clearButton = document.querySelector('button[name="clear"]');
+    const resultDiv = document.querySelector('.result');
+    const historyList = document.querySelector('.history ul');
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const formData = new FormData(form);
+
+        fetch('cepe.php?' + new URLSearchParams(formData), {
+            method: 'GET'
+        })
+        .then(response => response.json())
+        .then(data => {
+            resultDiv.textContent = `Result: ${data.result}`;
+            historyList.innerHTML = data.history.map(item => `<li>${item}</li>`).join('');
+        })
+        .catch(error => {
+            resultDiv.textContent = 'Error: Unable to calculate.';
+            console.error('Error:', error);
+        });
+    });
+
+    clearButton.addEventListener('click', function (e) {
+        e.preventDefault();
+
+        fetch('cepe.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ clear: true })
+        })
+        .then(response => response.json())
+        .then(data => {
+            historyList.innerHTML = '';
+        })
+        .catch(error => {
+            console.error('Error clearing history:', error);
+        });
+    });
+});
+</script>
+</head>
+
+<body>
+<div class="calculator">
+<h2>PHP Super Calculator</h2>
+<form method="get" action="">
+First Number:
+<input type="number" name="num1" required>
+
+Second Number:
+<input type="number" name="num2" required>
+
+Operation:
+<select name="operator" required>
+<option value="add">Add (+)</option>
+<option value="subtract">Subtract (−)</option>
+<option value="multiply">Multiply (×)</option>
+<option value="divide">Divide (÷)</option>
+<option value="percent">Percent (%)</option>
+<option value="exponent">Exponent (^)</option>
+</select>
+
+<input type="submit" value="Calculate">
+</form>
+
+<div class="result">Result: 6</div>
+
+<div class="history">
+<h3>Calculation History:</h3>
+<ul>
+<li>2 + 2 = 6</li>
+<li>2 + 2 = 6</li>
+<li>2 + 2 = 6</li>
+</ul>
+</div>
+
+<form method="post" action="">
+<button class="clear" name="clear" type="submit">Clear History</button>
+</form>
+
+</div>
+</body>
+</html>
+
+
+
